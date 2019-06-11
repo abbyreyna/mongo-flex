@@ -11,9 +11,9 @@ var cheerio = require("cheerio");
 // Require all models
 var db = require("./models");
 
-var PORT = 3000;
+var PORT = process.env.PORT || 3000;
 
-var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/mongoHeadlines";
+var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/gamenews";
 
 // Initialize Express
 var app = express();
@@ -30,7 +30,6 @@ app.use(express.static("public"));
 
 // Connect to the Mongo DB
 mongoose.connect(MONGODB_URI);
-// mongoose.connect("mongodb://localhost/unit18Populater", { useNewUrlParser: true });
 
 var mongodb = mongoose.connection;
 
@@ -40,24 +39,27 @@ mongodb.on("error", function() {
 
 // Routes
 // A GET route for scraping the echoJS website
-app.get("/]", function(req, res) {
+app.get("scrape", function(req, res) {
     // First, we grab the body of the html with axios
     axios.get("https://www.gameinformer.com/").then(function(response) {
       // Then, we load that into cheerio and save it to $ for a shorthand selector
       var $ = cheerio.load(response.data);
   
       // Now, we grab every h2 within an article tag, and do the following:
-      $("article h2").each(function(i, element) {
+      $("article").each(function(i, element) {
         // Save an empty result object
         var result = {};
   
         // Add the text and href of every link, and save them as properties of the result object
         result.title = $(this)
-          .children("a")
+          .children("h3.page-title article-title")
           .text();
         result.link = $(this)
           .children("a")
           .attr("href");
+        result.img = $(this)
+          .children("div")
+          .attr("data-imgurl-mobile");
   
         // Create a new Article using the `result` object built from scraping
         db.Article.create(result)
@@ -125,7 +127,16 @@ app.get("/]", function(req, res) {
         res.json(err);
       });
   });
-  
+  //Route for when posts are deleted
+  app.delete("/articles/delete/:id", function (req,res){
+    console.log(req.params.id);
+    db.Article.findByIdAndRemove({
+      _id: req.params(dbPost);
+    })
+    .catch(function(err){
+      res.json(dbPost);
+    });
+  });
   // Start the server
   app.listen(PORT, function() {
     console.log("App running on port " + PORT + "!");
