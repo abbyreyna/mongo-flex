@@ -32,10 +32,15 @@ app.use(express.static("public"));
 mongoose.connect(MONGODB_URI);
 // mongoose.connect("mongodb://localhost/unit18Populater", { useNewUrlParser: true });
 
+var mongodb = mongoose.connection;
+
+mongodb.on("error", function() {
+  console.log("Mongoose connection successful.");
+});
 
 // Routes
 // A GET route for scraping the echoJS website
-app.get("/scrape", function(req, res) {
+app.get("/]", function(req, res) {
     // First, we grab the body of the html with axios
     axios.get("https://www.gameinformer.com/").then(function(response) {
       // Then, we load that into cheerio and save it to $ for a shorthand selector
