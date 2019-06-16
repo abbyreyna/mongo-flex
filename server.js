@@ -41,26 +41,31 @@ mongodb.on("error", function() {
 // A GET route for scraping the GI website
 app.get("/scrape", function(req, res) {
     // First, we grab the body of the html with axios
-    axios.get("https://www.gameinformer.com/").then(function(response) {
+    axios.get("https://www.gameinformer.com/news").then(function(response) {
       // Then, we load that into cheerio and save it to $ for a shorthand selector
       var $ = cheerio.load(response.data);
   
       // Now, we grab every h3 within an article tag, and do the following:
-      $("article").each(function(i, element) {
+      $("h2").each(function(i, element) {
         // Save an empty result object
         var result = {};
   
         // Add the text and href of every link, and save them as properties of the result object
         result.title = $(this)
-          .children("h3.page-title article-title")
+        const title = $(element)
+          .find(".page-title")
           .text();
+          console.log(title);
         result.link = $(this)
-          .children("a")
+        const link = $(element)
+          .find("a")
           .attr("href");
+          console.log(link);
         result.img = $(this)
-          .children("div")
+        const img = $(element)
+          .find("div")
           .attr("data-imgurl-mobile");
-  
+          console.log(img);
         // Create a new Article using the `result` object built from scraping
         db.Article.create(result)
           .then(function(dbArticle) {
