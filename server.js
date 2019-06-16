@@ -56,7 +56,7 @@ app.get("/scrape", function(req, res) {
       var $ = cheerio.load(response.data);
   
       // Now, we grab every h3 within an article tag, and do the following:
-      $("h2").each(function(i, element) {
+      $("article").each(function(i, element) {
         // Save an empty result object
         var result = {};
   
@@ -73,8 +73,8 @@ app.get("/scrape", function(req, res) {
           console.log(link);
         result.img = $(this)
         const img = $(element)
-          .find("div")
-          .attr("data-imgurl-mobile");
+          .find("picture")
+          .attr("img");
           console.log(img);
 
         var articleData = {
