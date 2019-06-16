@@ -37,6 +37,16 @@ mongodb.on("error", function() {
   console.log("Mongoose connection successful.");
 });
 
+app.get("/all", function(req,res){
+  db.Article.find({}, function (err, found){
+    if (err) {
+      console.log(err);
+    }else {
+      res.json(found);
+    };
+  });
+});
+
 // Routes
 // A GET route for scraping the GI website
 app.get("/scrape", function(req, res) {
@@ -66,6 +76,13 @@ app.get("/scrape", function(req, res) {
           .find("div")
           .attr("data-imgurl-mobile");
           console.log(img);
+
+        var articleData = {
+          title: title,
+          link: link,
+          img: img
+        };
+
         // Create a new Article using the `result` object built from scraping
         db.Article.create(result)
           .then(function(dbArticle) {
@@ -77,10 +94,8 @@ app.get("/scrape", function(req, res) {
             console.log(err);
           });
       });
-  
-      // Send a message to the client
-      res.send("Scrape Complete");
     });
+    res.redirect("/");
   });
   
   // Route for getting all Articles from the db
