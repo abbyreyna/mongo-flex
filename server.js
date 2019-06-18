@@ -39,7 +39,7 @@ mongodb.on("error", function() {
 
 // Routes
 // A GET route that finds all results from the data collection
-app.ge+/t("/all", function(req,res){
+app.get("/all", function(req,res){
   db.Article.find({}, function (err, found){
     if (err) {
       console.log(err);
